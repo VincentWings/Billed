@@ -47,6 +47,16 @@ export default ({ data: bills, loading, error }) => {
   } else if (error) {
     return ErrorPage(error)
   }
+
+  // Check if 'bills' exists and is an array before sorting
+  let sortedBills = []
+
+  if (bills && Array.isArray(bills)) {
+    // Sort bills from most recent to oldest based on the date
+    sortedBills = bills.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date)
+    })
+  }
   
   return (`
     <div class='layout'>
@@ -69,7 +79,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(bills)}
+            ${rows(sortedBills)}
           </tbody>
           </table>
         </div>
