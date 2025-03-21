@@ -228,3 +228,73 @@ describe("Given that I am a user on login page", () => {
     });
   });
 });
+
+// Test to cover the case where login fails and createUser is called
+
+describe("Given that login fails and a new user is created", () => {
+  test("Then it should call createUser() and retry login", async () => {
+    // Show login form in the DOM
+    document.body.innerHTML = LoginUI();
+
+    // Fill email and password fields
+    fireEvent.change(screen.getByTestId("admin-email-input"), {
+      target: { value: "hradmin@email.com" },
+    });
+    fireEvent.change(screen.getByTestId("admin-password-input"), {
+      target: { value: "admin123" },
+    });
+
+    const form = screen.getByTestId("form-admin");
+
+    // Mock localStorage to prevent real storage
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: jest.fn(() => null),
+        setItem: jest.fn(() => null),
+      },
+      writable: true,
+    });
+
+    // Simulate navigation function
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+
+    // Mock login fails first, then succeeds
+    const mockLogin = jest
+      .fn()
+      .mockRejectedValueOnce("login failed")
+      .mockResolvedValueOnce({ jwt: "1234" });
+
+    // Mock user creation
+    const mockCreateUser = jest.fn(() => Promise.resolve());
+
+    // Provide mocked functions to the Login class
+    const login = new Login({
+      document,
+      localStorage: window.localStorage,
+      onNavigate,
+      PREVIOUS_LOCATION: "",
+      store: {
+        login: mockLogin,
+        users: () => ({ create: mockCreateUser }),
+      },
+    });
+
+    // Submit the form
+    form.addEventListener("submit", login.handleSubmitAdmin);
+    fireEvent.submit(form);
+
+    // Wait for all promises to resolve
+    await new Promise(process.nextTick);
+
+    // Expect login to be called twice (before and after createUser)
+    expect(mockLogin).toHaveBeenCalledTimes(2);
+
+    // Expect createUser to be called after first login failed
+    expect(mockCreateUser).toHaveBeenCalled();
+
+    // Expect jwt to be stored in localStorage
+    expect(window.localStorage.setItem).toHaveBeenCalledWith("jwt", "1234");
+  });
+});
