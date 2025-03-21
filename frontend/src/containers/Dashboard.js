@@ -131,7 +131,10 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0
+    // Avoid resetting the counter when changing list index
+    // We keep this.counter value even if the admin opens another list (status)
+    // So multiple lists can stay open and interactive at the same time
+    if (this.counter === undefined) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
