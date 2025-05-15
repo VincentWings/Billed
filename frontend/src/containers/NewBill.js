@@ -25,9 +25,9 @@ export default class NewBill {
 
     // Validate the file extension (only JPG, JPEG, PNG are allowed)
     const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-    
+
     if (!allowedExtensions.exec(fileName)) {
-      alert("Only JPG, JPEG, and PNG files are allowed."); // Alert user if the file type is invalid
+      alert("Seuls les fichiers JPG, JPEG et PNG sont autorisés."); // Alert user if the file type is invalid
       e.target.value = ""; // Clear the file input field
       return; // Stop the process
     }
