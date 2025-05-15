@@ -69,7 +69,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(bills ? bills.sort((a, b) => new Date(a.date) - new Date(b.date)) : [])}
+            ${rows(bills ? bills.sort((a, b) => new Date(b.date) - new Date(a.date)) : [])}
           </tbody>
           </table>
         </div>
