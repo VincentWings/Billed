@@ -38,7 +38,8 @@ export default class {
             try {
               return {
                 ...doc,
-                date: formatDate(doc.date),
+                rawDate: doc.date, // Using raw date for sorting
+                date: formatDate(doc.date), // Formatted date for display
                 status: formatStatus(doc.status)
               }
             } catch(e) {
@@ -47,11 +48,15 @@ export default class {
               console.log(e,'for',doc)
               return {
                 ...doc,
-                date: doc.date,
+                rawDate: doc.date, // Using raw date for sorting
+                date: formatDate(doc.date), // Formatted date for display
                 status: formatStatus(doc.status)
               }
             }
           })
+          // Sort bills by raw date (from latest to earliest)
+          .sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+
           console.log('length', bills.length)
         return bills
       })
