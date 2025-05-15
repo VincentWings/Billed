@@ -17,14 +17,28 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
+
+    // Retrieve the selected file
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+
+    // Validate the file extension (only JPG, JPEG, PNG are allowed)
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+    
+    if (!allowedExtensions.exec(fileName)) {
+      alert("Only JPG, JPEG, and PNG files are allowed."); // Alert user if the file type is invalid
+      e.target.value = ""; // Clear the file input field
+      return; // Stop the process
+    }
+
+    // Initialize FormData for the file upload
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
 
+    // Upload the file to the server
     this.store
       .bills()
       .create({
@@ -34,7 +48,7 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
+        console.log(fileUrl) // Confirm successful upload
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
